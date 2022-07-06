@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  mysqldb:
+    build:
+      context: .
+      dockerfile: ./mysql/Dockerfile
+    image: moderation_mysqldb
+    restart: always
+    env_file: ./.env
+    environment:
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      MYSQL_DATABASE: $MYSQL_DATABASE
+    ports:
+      - $MYSQL_LOCAL_PORT:$MYSQL_DOCKER_PORT
+    networks:
+      - network-cluster
+    volumes:
+      - db-config:/etc/mysql
+      - db-data:/var/lib/mysql
+
+  fileserver:
+    build:
+      context: .
+      dockerfile: ./fileserver/Dockerfile
+    image: moderation_fileserver
+    env_file: ./.env
+    ports:
+      - $FILESERVER_LOCAL_PORT:$FILESERVER_DOCKER_PORT
+    volumes:
+      - ./fileserver:/fileserver
+    networks:
+      - network-cluster
+    stdin_open: true
+    tty: true
+    restart: always
+
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    image: moderation_backend
+    env_file: ./.env
+    ports:
+      - $BACKEND_LOCAL_PORT:$BACKEND_DOCKER_PORT
+    volumes:
+      - ./backend:/backend
+    networks:
+      - network-cluster
+    depends_on:
+      - mysqldb
+    stdin_open: true
+    tty: true
+    restart: always
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    image: moderation_frontend
+    env_file: ./.env
+    ports:
+      - $FRONTEND_LOCAL_PORT:$FRONTEND_DOCKER_PORT
+    volumes:
+      - ./frontend:/frontend
+    networks:
+      - network-cluster
+    depends_on:
+      - mysqldb
+      - backend
+      - fileserver
+    stdin_open: true
+    tty: true
+    restart: always
+
+volumes:
+  db-config:
+  db-data:
+networks:
+  network-cluster:
+    driver: bridge
