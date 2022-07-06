@@ -1,9 +1,7 @@
-<h1 align="center"> Moderation App </h1>
-<div align="center">
-An application for moderating incoming image reports and sending the moderation result to a system using a callback Url
-</div>  
+# Moderation App
 
-<br/>
+An application for moderating incoming image reports and sending the moderation result to a system using a callback Url
+
 
 ## Technologies Used Include
 
@@ -14,11 +12,7 @@ An application for moderating incoming image reports and sending the moderation 
 - [Express](https://expressjs.com/)
 - [MySQL](https://www.mysql.com/)
 
-<br/>
-
 > There are different README.md files inside each folder for standalone usage, including HTTP requests
-
-<br/>
 
 ## Enviromental Variables
 
