@@ -7,7 +7,7 @@ import type { ReportType } from "../types/Report_Request";
 /**
  * Creates New Report
  * @param report 
- * @returns Promise<InsertResult>
+ * @returns Promise
  */
 export function createReport(report: ReportType | Report, archive?: boolean) {
     const newReport: Report = new Report()
@@ -17,7 +17,6 @@ export function createReport(report: ReportType | Report, archive?: boolean) {
     newReport.prefilterReport = report.prefilterReport;
     newReport.prefilterReportScore = report.prefilterReportScore;
     newReport.status = report.status ? report.status : "Pending";
-
     try {
         if (archive) {
             return AppDataSource.getRepository(Archive).save(newReport);
@@ -31,7 +30,8 @@ export function createReport(report: ReportType | Report, archive?: boolean) {
 }
 
 /**
- * Performs ACID transaction on the report (removes from report table, insert into archive modified with new status from frontend)
+ * Performs ACID transaction on the report (removes from report table, insert into archive modified with new status from frontend) 
+ * and Sends a POST request via Callback URL
  * @param report 
  * @returns 
  */
@@ -43,17 +43,30 @@ export async function updateAndArchiveReport(id: number, status: ('Pending' | 'A
     if (reportToUpdate) {
         reportToUpdate.status = status ? status : "Pending";
 
-        return await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
-            await transactionalEntityManager.remove(Report, reportToUpdate);
-            await transactionalEntityManager.insert(Archive, reportToUpdate);
-        })
+        const queryRunner = AppDataSource.createQueryRunner()
+        await queryRunner.connect()
+
+        await queryRunner.startTransaction()
+        await queryRunner.manager.remove(Report, reportToUpdate);
+        await queryRunner.manager.insert(Archive, reportToUpdate);
+
+        // commit transaction now:
+        await queryRunner.commitTransaction()
             .then(async () => {
                 await axios.post(reportToUpdate.callbackUrl, { reportToUpdate })
-                    .catch(() => { console.log("CALLBACK URL SENDING FAILURE")}) //implement rollback transaction logic
+                    .catch(async () => {
+                        await queryRunner.rollbackTransaction();
+                        console.log("CALLBACK URL SENDING FAILURE")
+                    })
             })
-            .catch(() => { throw new Error("Transaction Failed") })
+            .catch(() => {
+                throw new Error("Transaction Failed")
+            })
+            .finally(async () => {
+                await queryRunner.release()
+            })
+        return
     }
-
     throw new Error("Entity Not Found");
 }
 

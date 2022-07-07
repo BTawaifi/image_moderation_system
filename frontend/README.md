@@ -24,9 +24,12 @@ Serves Images and Stores Them
 > Different depending on your database configuration
 
 ```
-NODE_ENV=production
 PORT=8000
 GENERATE_SOURCEMAP=false
+REACT_APP_FILESERVER_HOST = http://localhost
+REACT_APP_FILESERVER_LOCAL_PORT = 8080
+REACT_APP_BACKEND_HOST = http://localhost
+REACT_APP_BACKEND_PORT = 3000
 ```
 
 ## Scripts

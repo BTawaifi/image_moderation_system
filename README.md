@@ -14,6 +14,8 @@ An application for moderating incoming image reports and sending the moderation 
 
 > There are different README.md files inside each folder for standalone usage, including HTTP requests
 
+> NOTE: Moderation Will fail if the callback URL doesn't recieve a Requst (ACID transaction rollback)
+
 ## Enviromental Variables
 
 You can place the environment variables directly inside docker-compose.yml or using .env file
@@ -36,6 +38,11 @@ BACKEND_DOCKER_PORT = 3000
 PREFILTER_API_USER = 
 PREFILTER_API_SECRET = 
 FILESERVER_HOST = http://fileserver
+
+REACT_APP_FILESERVER_HOST = http://fileserver
+REACT_APP_FILESERVER_LOCAL_PORT = 8080
+REACT_APP_BACKEND_HOST = http://backend
+REACT_APP_BACKEND_PORT = 3000
 
 FILESERVER_LOCAL_PORT = 8080
 FILESERVER_DOCKER_PORT = 8080

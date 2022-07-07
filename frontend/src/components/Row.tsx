@@ -61,7 +61,7 @@ export default function Row(props: { row: ReportType, remove: Function }) {
                 <TableBody>
                   <TableRow>
                     <TableCell scope="row">
-                      <img width="150px" src={`${process.env["FILESERVER_HOST"]} + ':' + ${process.env["FILESERVER_LOCAL_PORT"]} + /` + row.imagePath} alt="Recieved Pic" />
+                      <img width="150px" src={`${process.env["REACT_APP_FILESERVER_HOST"]}:${process.env["REACT_APP_FILESERVER_LOCAL_PORT"]}/images/` + row.imagePath} alt="Recieved Pic" />
                     </TableCell>
                     <TableCell align="center">
                       <Stack spacing={2} direction="row">

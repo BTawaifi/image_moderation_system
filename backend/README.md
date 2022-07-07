@@ -10,6 +10,7 @@ We are using Sight Engine for prefilter please acquire PREFILTER_API_USER and PR
 
 `` https://sightengine.com/ ``
 
+> NOTE: Moderation Will fail if the callback URL doesn't recieve a Requst (ACID transaction rollback)
 
 ## Using Docker
 
